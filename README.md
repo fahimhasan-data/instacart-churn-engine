@@ -180,3 +180,7 @@ Before Step 1.2, share:
 |---|---|---|
 | 1 | Three-layer schema (`raw` / `analytics` / `features`) | Separates ingestion, cleaning, and modeling; mirrors production practice |
 | 2 | Constraints added after bulk load | Load performance |
+| 3 | Treat `days_since_prior_order = 30` as right-censored ("30+ days"), not a real measurement | 11.49% of gaps (369,323 of 3,214,874) sit at exactly 30. We can't tell a 31-day gap from a 90-day gap, and averages and standard deviations are biased downward. Flagged as `is_capped_gap`; Phase 2 will run sensitivity analysis with and without capped gaps |
+| 4 | Keep NULL `days_since_prior_order` as NULL; it means "first order" | Exactly 206,209 NULLs, one per user, none on later orders. It's a structural NULL, not missing data, so first orders are excluded from gap statistics |
+| 5 | Exclude `test` orders from basket-level analysis | All 75,000 `test` orders have no product rows (labels were hidden). They remain usable for order-level features |
+| 6 | Unify `prior` and `train` baskets through a view with a `source_set` column | Keeps raw tables untouched while giving one place to query baskets; `UNION ALL` avoids a pointless dedupe because the sets cannot overlap |
