@@ -185,3 +185,5 @@ Before Step 1.2, share:
 | 5 | Exclude `test` orders from basket-level analysis | All 75,000 `test` orders have no product rows (labels were hidden). They remain usable for order-level features |
 | 6 | Unify `prior` and `train` baskets through a view with a `source_set` column | Keeps raw tables untouched while giving one place to query baskets; `UNION ALL` avoids a pointless dedupe because the sets cannot overlap |
 | 7 | Treat `order_number = 100` as a truncation ceiling | 1,374 users (~0.67%) have exactly 100 orders, so order counts for them are lower bounds. Kept in the data; flagged for sensitivity checks in Phase 2 and 3 |
+| 8 | Use the median gap as the primary "typical gap"; keep mean, SD, and an uncapped mean as secondary/sensitivity features | 20% of users have ≥50% capped gaps. Dropping capped gaps biases slow users toward looking fast; the median is robust to censoring below 50% |
+| 9 | Build features from `prior` orders only; store each user's holdout order in a separate table | Prevents leakage. No user is observed fully churning, so the Phase 2 target will be a late return relative to the user's own rhythm |
