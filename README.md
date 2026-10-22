@@ -1,7 +1,7 @@
 # Customer Re-Engagement & Churn Prevention Engine
 ### Optimizing Retention and Reorder Timing for E-Grocery (Instacart Market Basket Data)
 
-> **Status:** > **Status:** Phase 1 complete | Phase 2 - in progress
+> **Status:** Phase 1 complete | Phase 2 - in progress
 
 ## 1. Business Problem
 
