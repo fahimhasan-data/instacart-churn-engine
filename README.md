@@ -184,3 +184,4 @@ Before Step 1.2, share:
 | 4 | Keep NULL `days_since_prior_order` as NULL; it means "first order" | Exactly 206,209 NULLs, one per user, none on later orders. It's a structural NULL, not missing data, so first orders are excluded from gap statistics |
 | 5 | Exclude `test` orders from basket-level analysis | All 75,000 `test` orders have no product rows (labels were hidden). They remain usable for order-level features |
 | 6 | Unify `prior` and `train` baskets through a view with a `source_set` column | Keeps raw tables untouched while giving one place to query baskets; `UNION ALL` avoids a pointless dedupe because the sets cannot overlap |
+| 7 | Treat `order_number = 100` as a truncation ceiling | 1,374 users (~0.67%) have exactly 100 orders, so order counts for them are lower bounds. Kept in the data; flagged for sensitivity checks in Phase 2 and 3 |
