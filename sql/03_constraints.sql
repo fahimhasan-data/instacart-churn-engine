@@ -1,4 +1,4 @@
--- sql/03_constraints.sql  (idempotent: safe to re-run)
+-- sql/03_constraints.sql 
 
 -- 0. Reset: drop FKs first (they depend on PKs), then PKs, then indexes
 ALTER TABLE raw.order_products_train DROP CONSTRAINT IF EXISTS fk_opt_product;

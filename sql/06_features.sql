@@ -85,3 +85,38 @@ ALTER TABLE features.user_holdout ADD PRIMARY KEY (user_id);
 
 ANALYZE features.user_features;
 ANALYZE features.user_holdout;
+
+
+-- A. Row counts: expect 206,209 in both
+SELECT (SELECT COUNT(*) FROM features.user_features) AS features_rows,
+       (SELECT COUNT(*) FROM features.user_holdout)  AS holdout_rows;
+
+-- B. NULL profile and ranges
+SELECT
+    COUNT(*) FILTER (WHERE sd_gap IS NULL)             AS null_sd,
+    COUNT(*) FILTER (WHERE median_gap IS NULL)         AS null_median,
+    MIN(n_prior_orders) AS min_prior, MAX(n_prior_orders) AS max_prior,
+    MIN(mean_gap) AS min_mean_gap,    MAX(mean_gap) AS max_mean_gap,
+    MIN(reorder_ratio) AS min_reorder, MAX(reorder_ratio) AS max_reorder,
+    COUNT(*) FILTER (WHERE is_censored_heavy)          AS censored_heavy_users,
+    COUNT(*) FILTER (WHERE is_truncated_history)       AS truncated_users
+FROM features.user_features;
+
+-- C. Hand-check user 1
+SELECT f.*, h.holdout_gap_days, h.eval_set
+FROM features.user_features f
+JOIN features.user_holdout h USING (user_id)
+WHERE f.user_id = 1;
+
+
+--Test prediction
+SELECT
+    CASE WHEN is_censored_heavy THEN '3. mostly capped'
+         WHEN n_capped_gaps = 0 THEN '1. no capped'
+         ELSE '2. some capped' END       AS grp,
+    COUNT(*)                             AS users,
+    ROUND(AVG(reorder_ratio), 3)         AS avg_reorder_ratio,
+    ROUND(AVG(avg_basket_size), 2)       AS avg_basket,
+    ROUND(AVG(n_prior_orders), 1)        AS avg_orders
+FROM features.user_features
+GROUP BY 1 ORDER BY 1;
