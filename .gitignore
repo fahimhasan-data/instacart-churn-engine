@@ -4,4 +4,4 @@ data/raw/
 __pycache__/
 .env
 venv/
-.vscode/
+.vscode/powerbi/*.pbix
