@@ -202,6 +202,9 @@ Before Step 1.2, share:
 | 22 | Logistic regression drops `n_gaps` and `gap_trend`, imputes `mean_gap_uncapped` with a missing-flag, and compares to the naive rule at equal alert volume | Exact collinearity; informative missingness (8,797 users); fair precision/recall comparison |
 | 23 | Logistic regression: test ROC-AUC 0.754, PR-AUC 0.537 (CV 0.758 / 0.537); at the naive rule's alert volume, precision 0.55 and recall 0.46 vs 0.52 and 0.43 | The ranking gain is clear, the practical gain at equal volume is ~3 points; correlated gap features share coefficients, so interpret groups, not single coefficients |
 | 24 | Gradient boosting (test ROC-AUC 0.765, PR-AUC 0.549) beats logistic (0.754, 0.537) by ~0.011; at equal alert volume precision/recall are identical to 2 decimals | The signal is largely linear; the interpretable model is a candidate for production. Final choice after calibration and decile lift in Step 3.4 |
+| 25 | Probabilities are well calibrated (Brier 0.178 logistic / 0.174 boosting vs 0.213 baseline; max decile deviation ~2.4 pts), so scores are shown as probabilities in Power BI | Calibration measured on the untouched test set |
+| 26 | Scoring model = gradient boosting; logistic regression kept as the interpretable benchmark | Boosting wins every comparison by small margins (top-5% precision 0.666 vs 0.643), finds a near-certain-return group (bottom decile 0.2% vs 2.3% capped), and batch scoring removes its deployment cost |
+| 27 | Report grouped permutation importance for correlated features | Shuffling the gap family together drops PR-AUC by 0.154 versus 0.099 summed from single features. Ranking: recent/typical gap (0.154) > tenure (0.066) > basket (0.014) > capping/variability (0.008) > time of day (~0). Agrees with the logistic coefficients |
 
 ## Key Findings (Phase 2)
 - **30% of customers' final gap is 30+ days** (63,186 of 206,209); 11.5% of all gaps are right-censored at 30.
