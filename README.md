@@ -198,6 +198,8 @@ Before Step 1.2, share:
 | 18 | Use "capped holdout if last prior gap was capped" as the naive baseline for Phase 3 | Capped gaps persist within users (42% vs 18% next-gap capped rate), so a trivial rule already carries signal; the model must beat it |
 | 19 | Phase 3 target = holdout gap capped at 30 days (≥30), defined for all 206,209 users; z-score and ratio labels kept as segment flags | Observed (30.6% base rate), threshold-free, and covers the ~29% of users who lack a reliable personal rhythm and carry higher risk. Late-return prevalence ranges 9-32% across (capped handling × rule), min-gaps (3/5/8) matters little |
 | 20 | Model inputs come only from `features.user_features`; holdout-derived columns are never loaded, and an assertion enforces it | Prevents leakage by construction. Stratified random 80/20 split by user (no real dates exist for a time split) |
+| 21 | Benchmarks to beat on the test set: ROC-AUC 0.685 and PR-AUC 0.458 (last prior gap as score); majority rule gets 69.4% accuracy with 0% recall | Accuracy is not the headline metric; PR-AUC is judged against the 0.306 base rate |
+| 22 | Logistic regression drops `n_gaps` and `gap_trend`, imputes `mean_gap_uncapped` with a missing-flag, and compares to the naive rule at equal alert volume | Exact collinearity; informative missingness (8,797 users); fair precision/recall comparison |
 
 ## Key Findings (Phase 2)
 - **30% of customers' final gap is 30+ days** (63,186 of 206,209); 11.5% of all gaps are right-censored at 30.
