@@ -200,6 +200,7 @@ Before Step 1.2, share:
 | 20 | Model inputs come only from `features.user_features`; holdout-derived columns are never loaded, and an assertion enforces it | Prevents leakage by construction. Stratified random 80/20 split by user (no real dates exist for a time split) |
 | 21 | Benchmarks to beat on the test set: ROC-AUC 0.685 and PR-AUC 0.458 (last prior gap as score); majority rule gets 69.4% accuracy with 0% recall | Accuracy is not the headline metric; PR-AUC is judged against the 0.306 base rate |
 | 22 | Logistic regression drops `n_gaps` and `gap_trend`, imputes `mean_gap_uncapped` with a missing-flag, and compares to the naive rule at equal alert volume | Exact collinearity; informative missingness (8,797 users); fair precision/recall comparison |
+| 23 | Logistic regression: test ROC-AUC 0.754, PR-AUC 0.537 (CV 0.758 / 0.537); at the naive rule's alert volume, precision 0.55 and recall 0.46 vs 0.52 and 0.43 | The ranking gain is clear, the practical gain at equal volume is ~3 points; correlated gap features share coefficients, so interpret groups, not single coefficients |
 
 ## Key Findings (Phase 2)
 - **30% of customers' final gap is 30+ days** (63,186 of 206,209); 11.5% of all gaps are right-censored at 30.
