@@ -205,6 +205,7 @@ Before Step 1.2, share:
 | 25 | Probabilities are well calibrated (Brier 0.178 logistic / 0.174 boosting vs 0.213 baseline; max decile deviation ~2.4 pts), so scores are shown as probabilities in Power BI | Calibration measured on the untouched test set |
 | 26 | Scoring model = gradient boosting; logistic regression kept as the interpretable benchmark | Boosting wins every comparison by small margins (top-5% precision 0.666 vs 0.643), finds a near-certain-return group (bottom decile 0.2% vs 2.3% capped), and batch scoring removes its deployment cost |
 | 27 | Report grouped permutation importance for correlated features | Shuffling the gap family together drops PR-AUC by 0.154 versus 0.099 summed from single features. Ranking: recent/typical gap (0.154) > tenure (0.066) > basket (0.014) > capping/variability (0.008) > time of day (~0). Agrees with the logistic coefficients |
+| 28 | Scores are 5-fold out-of-fold for all users; tiers = High (top 20%), Medium (next 30%), Low (bottom 50%) | Each user is scored by a model that never saw them. Predicted vs. actual rate by tier: 0.580/0.579, 0.409/0.410, 0.136/0.135 |
 
 ## Key Findings (Phase 2)
 - **30% of customers' final gap is 30+ days** (63,186 of 206,209); 11.5% of all gaps are right-censored at 30.
@@ -212,3 +213,26 @@ Before Step 1.2, share:
 - **The final gap is capped more often than a user's own history** (+7.8 pts on average, small effect, d ≈ 0.17), consistently across tenure bins.
 - **A z ≥ 2 rule flags 9.0% of users, 4x the normal expectation**, but a placebo test shows most of that is gap-distribution skew, not an end-of-history signal. The capped-gap signal is about twice as strong.
 - **"Late return" prevalence ranges from 9% to 32%** depending on rule and censoring handling, so we model the observed capped holdout gap instead.
+
+## Model Results (Phase 3)
+Target: next order arrives 30+ days after the previous one (30.6% of users). Features use prior orders only.
+
+| Model | ROC-AUC | PR-AUC | Precision* | Recall* |
+|---|---|---|---|---|
+| Always predict "on time" | 0.500 | 0.306 | 0.000 | 0.000 |
+| Naive: last gap was capped | 0.685 | 0.458 | 0.516 | 0.434 |
+| Logistic regression | 0.754 | 0.537 | 0.550 | 0.464 |
+| Gradient boosting (chosen) | 0.765 | 0.549 | 0.552 | 0.465 |
+
+*Flagging the same 25.8% of users for every model. Test set: 41,242 users.
+
+- Calibrated: predicted vs. actual capped rate is 0.580/0.579 (High), 0.409/0.410 (Medium), 0.136/0.135 (Low).
+- Top 10% of users by score: 2.0x lift. The riskiest 50% hold about 78% of all late returns.
+- Strongest predictors (grouped permutation importance): recent/typical gap length, then tenure.
+- Gradient boosting beats logistic regression by only ~0.011 ROC-AUC; the signal is largely linear.
+
+### Limitations
+- No real dates exist, so the train/test split is random by user, not temporal.
+- Scores are retrospective: every user's outcome is known. Production use would score customers whose next gap is unknown.
+- Gaps are capped at 30 days, so "30+" cannot be split further, and true churn is never observed.
+- Importance shows what the model relies on, not what causes late returns.
