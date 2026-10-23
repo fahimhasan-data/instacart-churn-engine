@@ -1,7 +1,13 @@
+@"
 data/raw/
 *.csv
+!docs/*.csv
 .ipynb_checkpoints/
 __pycache__/
 .env
 venv/
-.vscode/powerbi/*.pbix
+.vscode/
+powerbi/
+"@ | Set-Content .gitignore
+
+
