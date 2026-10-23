@@ -1,7 +1,7 @@
 # Customer Re-Engagement & Churn Prevention Engine
 ### Optimizing Retention and Reorder Timing for E-Grocery (Instacart Market Basket Data)
 
-> **Status:** Phase 1 complete | Phase 2 - in progress
+> **Status:** Phase 2 complete | Phase 3 - in progress
 
 ## 1. Business Problem
 
@@ -197,3 +197,10 @@ Before Step 1.2, share:
 | 17 | Do not use "z ≥ 2" alone as a churn label; consider the capped holdout gap (≥30 days) as the Phase 3 target | Placebo test: the same z-rule flags 8.1% of users on an ordinary earlier gap vs 9.2% on the final gap (+1.1 pts), so most of its tail is distribution shape. The capped-gap rate differs more (22.4% vs 18.4%) and needs no personal threshold |
 | 18 | Use "capped holdout if last prior gap was capped" as the naive baseline for Phase 3 | Capped gaps persist within users (42% vs 18% next-gap capped rate), so a trivial rule already carries signal; the model must beat it |
 | 19 | Phase 3 target = holdout gap capped at 30 days (≥30), defined for all 206,209 users; z-score and ratio labels kept as segment flags | Observed (30.6% base rate), threshold-free, and covers the ~29% of users who lack a reliable personal rhythm and carry higher risk. Late-return prevalence ranges 9-32% across (capped handling × rule), min-gaps (3/5/8) matters little |
+
+## Key Findings (Phase 2)
+- **30% of customers' final gap is 30+ days** (63,186 of 206,209); 11.5% of all gaps are right-censored at 30.
+- **Personal rhythm is measurable for only ~71% of users** (≥5 gaps, not all-capped); 4.3% have every gap capped.
+- **The final gap is capped more often than a user's own history** (+7.8 pts on average, small effect, d ≈ 0.17), consistently across tenure bins.
+- **A z ≥ 2 rule flags 9.0% of users, 4x the normal expectation**, but a placebo test shows most of that is gap-distribution skew, not an end-of-history signal. The capped-gap signal is about twice as strong.
+- **"Late return" prevalence ranges from 9% to 32%** depending on rule and censoring handling, so we model the observed capped holdout gap instead.
